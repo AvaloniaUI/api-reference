@@ -1,3 +1,4 @@
 [submodule "Avalonia"]
 	path = ext/Avalonia
 	url = https://github.com/AvaloniaUI/Avalonia.git
+    branch = release/latest
