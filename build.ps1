@@ -9,11 +9,15 @@ param (
 	[switch]$pack
 )
 
-$version = Get-Content ./AvaloniaVersion.txt
-
 # Update git submodules. 
-git submodule update --init --remote --depth=1 -f
 git submodule update --init --recursive
+
+# The current Avalonia version is stored in SharedVersion.props. Read it and write it out for the website.
+[xml]$xmldoc = Get-Content ./ext/Avalonia/build/SharedVersion.props
+$version = $xmldoc.Project.PropertyGroup.Version
+New-item ./website/AvaloniaVersion.txt -ItemType File -Value  $version -Force
+
+Write-Host "Avalonia version is $version"
 
 # set SHFBRoot
 $env:SHFBRoot = ".\src\packages\ewsoftware.shfb\2025.3.22\tools\"
@@ -87,5 +91,5 @@ if($build.IsPresent){
 
 # pack the md-files and version settings if pack switch is on
 if($pack.IsPresent){
-	Compress-Archive -Path ./website/docs, ./website/versionSettings.js -DestinationPath ./artifacts.zip -Force
+	Compress-Archive -Path ./website/docs, ./website/versionSettings.js, ./website/AvaloniaVersion.txt -DestinationPath ./artifacts.zip -Force
 }

@@ -1,9 +1,9 @@
 // @ts-check
 import fs from "node:fs";
 
-function getAvaloniaVerison (){
+function getAvaloniaVersion (){
     try {
-        const data = fs.readFileSync('./../AvaloniaVersion.txt', {encoding: 'utf8'});
+        const data = fs.readFileSync('./AvaloniaVersion.txt', {encoding: 'utf8'});
         return data;
     }
     catch (e) {
@@ -12,5 +12,5 @@ function getAvaloniaVerison (){
 }
 
 export const versionSettings = {
-    current: getAvaloniaVerison(),
+    current: getAvaloniaVersion(),
 };
