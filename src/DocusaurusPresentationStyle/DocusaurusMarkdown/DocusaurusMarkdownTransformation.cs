@@ -20,16 +20,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using DocusaurusPresentationStyle.DocusaurusMarkdown.Elements;
-using Sandcastle.Core;
 using Sandcastle.Core.PresentationStyle.Transformation;
 using Sandcastle.Core.PresentationStyle.Transformation.Elements;
 using Sandcastle.Core.PresentationStyle.Transformation.Elements.Html;
 using Sandcastle.Core.PresentationStyle.Transformation.Elements.Markdown;
+using Sandcastle.Core.Project;
 using Sandcastle.Core.Reflection;
 using CodeElement = DocusaurusPresentationStyle.DocusaurusMarkdown.Elements.CodeElement;
 using MarkdownGlossaryElement = Sandcastle.Core.PresentationStyle.Transformation.Elements.Markdown.GlossaryElement;
@@ -44,9 +43,9 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
     {
         //=====================================================================
 
-        private XDocument? pageTemplate;
+        private XDocument? _pageTemplate;
 
-        private static readonly HashSet<string> spacePreservedElements = new HashSet<string>(
+        private static readonly HashSet<string> SpacePreservedElements = new HashSet<string>(
             new[] { "code", "pre", "snippet" }, StringComparer.OrdinalIgnoreCase);
 
         //=====================================================================
@@ -471,10 +470,10 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
         /// <inheritdoc />
         protected override XDocument RenderTopic()
         {
-            if(pageTemplate == null)
-                pageTemplate = LoadTemplateFile(this.TopicTemplatePath, null);
+            if(_pageTemplate == null)
+                _pageTemplate = LoadTemplateFile(this.TopicTemplatePath, null);
 
-            var document = new XDocument(pageTemplate);
+            var document = new XDocument(_pageTemplate);
 
             this.CurrentElement = document.Root;
 
@@ -527,7 +526,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                 // list of elements that should preserve space, just add the text as-is.  Otherwise,normalize the
                 // whitespace.
                 if(text.Length == 0 || (content.Name != "document" && content.Attribute(Element.XmlSpace) != null) ||
-                  spacePreservedElements.Contains(textNode.Parent?.Name.LocalName ?? string.Empty) ||
+                  SpacePreservedElements.Contains(textNode.Parent?.Name.LocalName ?? string.Empty) ||
                   ((textNode.Parent?.Name.LocalName == "div" || textNode.Parent?.Name.LocalName == "span") &&
                   textNode.Ancestors("syntax").Any()))
                 {
@@ -650,7 +649,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                     if(element != null)
                     {
                         if(n.UseValueForText)
-                            noticeText = element.Value?.NormalizeWhiteSpace();
+                            noticeText = element.Value.NormalizeWhiteSpace();
 
                         if(String.IsNullOrWhiteSpace(noticeText))
                             noticeText = n.NoticeMessage;
@@ -670,7 +669,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                     if(attr != null)
                     {
                         if(n.UseValueForText)
-                            noticeText = attr.Element("argument")?.Element("value")?.Value?.NormalizeWhiteSpace();
+                            noticeText = attr.Element("argument")?.Element("value")?.Value.NormalizeWhiteSpace();
 
                         if(String.IsNullOrWhiteSpace(noticeText))
                             noticeText = n.NoticeMessage;
@@ -692,7 +691,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                     message.Add("\n");
                     
                     // If the notice text starts with '@', it's a content item
-                    if(noticeText[0] == '@')
+                    if(noticeText is {Length: > 0} && noticeText[0] == '@')
                         message.Add(new XElement("include", new XAttribute("item", noticeText.Substring(1))));
                     else
                         message.Add(noticeText);
@@ -751,7 +750,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                     var tag = new XElement("Tag", new XAttribute("type", n.TagStyleClasses ?? "is-warning"));
 
                     // If the notice text starts with '@', it's a content item
-                    if(noticeText[0] == '@')
+                    if(noticeText is {Length: > 0} && noticeText[0] == '@')
                         tag.Add(new XElement("include", new XAttribute("item", noticeText.Substring(1))));
                     else
                         tag.Add(noticeText);
@@ -909,7 +908,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
             }
 
             var containers = transformation.ReferenceNode.Element("containers");
-            var libraries = containers?.Elements("library");
+            var libraries = containers?.Elements("library").ToArray() ?? [];
 
             content.Add("**",
                 new XElement("include", new XAttribute("item", "boilerplate_requirementsNamespace")), "** ",
@@ -919,13 +918,13 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
             int separatorSize = 1;
             bool first = true;
 
-            if(libraries?.Count() > 1)
+            if(libraries is {Length: > 1})
             {
                 content.Add("**",
                     new XElement("include", new XAttribute("item", "boilerplate_requirementsAssemblies")), "**");
                 separatorSize = 2;
             }
-            else
+            else 
             {
                 content.Add("**",
                     new XElement("include", new XAttribute("item", "boilerplate_requirementsAssemblyLabel")), "**");
@@ -963,21 +962,26 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
             // Show XAML XML namespaces for APIs that support XAML.  All topics that have auto-generated XAML
             // syntax get an "XMLNS for XAML" line in the Requirements section.  Topics with boilerplate XAML
             // syntax, e.g. "Not applicable", do NOT get this line.
-            var xamlCode = transformation.SyntaxNode.Elements("div").Where(d => d.Attribute("codeLanguage")?.Value.Equals(
-                "XAML", StringComparison.Ordinal) ?? false);
+            var xamlCode = transformation.SyntaxNode
+                .Elements("div")
+                .Where(d => d.Attribute("codeLanguage")?.Value.Equals("XAML", StringComparison.Ordinal) ?? false)
+                .ToArray();
 
-            if(xamlCode.Any())
+            if(xamlCode.Length != 0)
             {
-                var xamlXmlNS = xamlCode.Elements("div").Where(d => d.Attribute("class")?.Value == "xamlXmlnsUri");
+                var xamlXmlNs = xamlCode
+                    .Elements("div")
+                    .Where(d => d.Attribute("class")?.Value == "xamlXmlnsUri")
+                    .ToArray();
 
                 content.Add("  \n", "**",
                     new XElement("include", new XAttribute("item", "boilerplate_xamlXmlnsRequirements")), "** ");
 
-                if(xamlXmlNS.Any())
+                if(xamlXmlNs.Length != 0)
                 {
                     first = true;
 
-                    foreach(var d in xamlXmlNS)
+                    foreach(var d in xamlXmlNs)
                     {
                         if(!first)
                             content.Add(", ");
@@ -1048,10 +1052,10 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
             var elements = transformation.ReferenceNode.Element("elements")?.Elements("element").OrderBy(
                 e => e.Element("apidata")?.Attribute("name")?.Value).ToList();
 
-            if((elements?.Count ?? 0) == 0)
+            if(elements is null or { Count: 0 })
                 return;
 
-            var (title, _) = transformation.CreateSection(elements?[0].GenerateUniqueId(), true, "title_namespaces", null);
+            var (title, _) = transformation.CreateSection(elements[0].GenerateUniqueId(), true, "title_namespaces", null);
 
             transformation.CurrentElement.Add(title);
 
@@ -1095,10 +1099,10 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                 return name.Substring(name.IndexOf(':') + 1);
             }).ToList();
 
-            if((elements?.Count ?? 0) == 0)
+            if(elements is null or {Count : 0})
                 return;
 
-            var (title, _) = transformation.CreateSection(elements?[0].GenerateUniqueId(), true,
+            var (title, _) = transformation.CreateSection(elements[0].GenerateUniqueId(), true,
                 "tableTitle_namespace", null);
 
             transformation.CurrentElement.Add(title);
@@ -1226,7 +1230,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                 {
                     EnumValueFormat enumFormat = thisTransform.FlagsEnumValueFormat;
                     int groupSize = thisTransform.IncludeIntegerEnumSeparators ? 3 : 0, minWidth = 0;
-                    bool signedValues = enumValues.Any(v => v.Length > 0 && v[0] == '-');
+                    bool signedValues = enumValues.Any(v => v?.Length > 0 && v[0] == '-');
 
                     if(enumFormat != EnumValueFormat.IntegerValue &&
                       thisTransform.ReferenceNode.AttributeOfType("T:System.FlagsAttribute") != null)
@@ -1335,17 +1339,20 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
         {
             var allMembers = transformation.ReferenceNode.Element("elements")?.Elements("element").ToList();
 
-            if((allMembers?.Count ?? 0) == 0)
+            if(allMembers is null or {Count: 0})
                 return;
 
-            var overloads = allMembers?.Where(e => e.Attribute("api")!.Value.StartsWith("Overload:",
+            var overloads = allMembers.Where(e => e.Attribute("api")!.Value.StartsWith("Overload:",
                 StringComparison.Ordinal)).ToList();
 
             // Remove overload topics and add their members to the full member list
             foreach(var overload in overloads)
             {
-                allMembers.Remove(overload);
-                allMembers.AddRange(overload.Elements("element"));
+                if (overload != null)
+                {
+                    allMembers.Remove(overload);
+                    allMembers.AddRange(overload.Elements("element"));
+                }
             }
 
             var memberGroups = new Dictionary<ApiMemberGroup, List<XElement>>
@@ -1369,7 +1376,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                 // Group the members by section type
                 foreach(var m in allMembers)
                 {
-                    XElement? apiData = m.Element("apidata"), memberData = m.Element("memberdata"),
+                    XElement? apiData = m.Element("apidata"),
                         procedureData = m.Element("proceduredata");
 
                     // Some members such as inherited interface members on a derived interface, contain no
@@ -1476,7 +1483,6 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
                         e.Element("memberdata")?.Attribute("overload") == null &&
                         !(e.Parent?.Attribute("api")?.Value ?? String.Empty).StartsWith(
                             "Overload:", StringComparison.Ordinal)) ? "false" : "true";
-                    bool isExtensionMethod = e.AttributeOfType("T:System.Runtime.CompilerServices.ExtensionAttribute") != null;
 
                     var summaryCell = new XElement("td");
 
@@ -1577,9 +1583,11 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
         private static void RenderApiSectionTable(TopicTransformationCore transformation, string sectionTitleItem,
           IEnumerable<XElement> sectionElements)
         {
-            if(sectionElements.Any())
+            var sections = sectionElements as XElement[] ?? sectionElements.ToArray();
+            
+            if(sections.Length != 0)
             {
-                var (title, _) = transformation.CreateSection(sectionElements.First().GenerateUniqueId(), true,
+                var (title, _) = transformation.CreateSection(sections.First().GenerateUniqueId(), true,
                     sectionTitleItem, null);
 
                 transformation.CurrentElement.Add(title);
@@ -1588,7 +1596,7 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
 
                 transformation.CurrentElement.Add(table);
 
-                foreach(var se in sectionElements)
+                foreach(var se in sections)
                 {
                     var descCell = new XElement("td");
 
@@ -1669,10 +1677,12 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
             if(revisionHistory == null || revisionHistory.Attribute("visible")?.Value == "false")
                 return;
 
-            var revisions = revisionHistory.Elements("revision").Where(
-                h => h.Attribute("visible")?.Value != "false");
+            var revisions = revisionHistory
+                    .Elements("revision")
+                    .Where(h => h.Attribute("visible")?.Value != "false")
+                    .ToArray();
 
-            if(revisions.Any())
+            if(revisions.Length != 0)
             {
                 var (title, _) = transformation.CreateSection(revisionHistory.GenerateUniqueId(), true,
                     "title_revisionHistory", null);
@@ -1849,9 +1859,9 @@ namespace DocusaurusPresentationStyle.DocusaurusMarkdown
             }
 
             // Add a link to the namespace topic
-            string namespaceId = transformation.ReferenceNode.Element("containers")?.Element("namespace")?.Attribute("api")?.Value;
+            var namespaceId = transformation.ReferenceNode.Element("containers")?.Element("namespace")?.Attribute("api")?.Value;
 
-            if(!String.IsNullOrWhiteSpace(namespaceId))
+            if(!string.IsNullOrWhiteSpace(namespaceId))
             {
                 subsection.Add(new XElement("referenceLink",
                         new XAttribute("target", namespaceId),

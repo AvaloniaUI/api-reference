@@ -135,8 +135,8 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' " />
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' " />
 	<ItemGroup>
-		<PackageReference Include="EWSoftware.SHFB" Version="2025.03.22"/>
-		<PackageReference Include="EWSoftware.SHFB.NET" Version="9.0.0"/>
+		<PackageReference Include="EWSoftware.SHFB" Version="2025.9.30" />
+		<PackageReference Include="EWSoftware.SHFB.NET" Version="10.0.0" />
 	</ItemGroup>
 	<!-- Import the common build targets during NuGet restore because before the packages are being installed, $(SHFBROOT) is not set yet -->
 	<Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="'$(MSBuildRestoreSessionId)' != ''"/>

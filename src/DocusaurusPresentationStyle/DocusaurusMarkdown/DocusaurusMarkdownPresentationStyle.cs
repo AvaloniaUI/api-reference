@@ -18,12 +18,12 @@
 // 02/27/2025  TU   Adjusted the code to support the MDX-format
 //===============================================================================================================
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Sandcastle.Core;
 using Sandcastle.Core.PresentationStyle;
+using Sandcastle.Core.Project;
 
 namespace DocusaurusPresentationStyle.DocusaurusMarkdown
 {

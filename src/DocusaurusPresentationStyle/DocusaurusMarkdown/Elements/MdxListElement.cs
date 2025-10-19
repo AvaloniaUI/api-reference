@@ -79,7 +79,6 @@ public class MdxListElement : Element
                 
             default:
                 throw new ArgumentException($"Invalid element type {element.Attribute("type")?.Value}");
-                break;
         }
     }
 }

@@ -21,12 +21,10 @@ It is important to mind the build order.
 > ```
 
 ## Generate the API docs for newer Avalonia version
-Use the `set-version.ps1` script to update the version. 
+Use the `update-submodule.ps1` script to update the version to the latest stable. if you need any other branch version, you need to link the branch name for the submodule by hand. 
 
-```ps1
-# -version: specify the Avalonia version to document. If this parameter is not set, `AvaloniaVersion.txt` will be used instead. 
-.\set-version.ps1 11.2.0 
-```
+> [!NOTE]
+> The file `./ext/Avalonia/build/SharedVersion.props` stores the current version info. 
 
 > [!WARNING]
 > Remember to commit all updates made to the submodule. 
