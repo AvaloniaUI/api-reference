@@ -20,7 +20,7 @@ New-item ./website/AvaloniaVersion.txt -ItemType File -Value  $version -Force
 Write-Host "Avalonia version is $version"
 
 # set SHFBRoot
-$env:SHFBRoot = ".\src\packages\ewsoftware.shfb\2025.3.22\tools\"
+$env:SHFBRoot = ".\src\packages\ewsoftware.shfb\2025.9.30\tools\"
 
 # Define a list of dotNET projects to build
 $projectsToBuild = @(
