@@ -1,5 +1,3 @@
-using SandcastleBuilder.Utils.BuildComponent;
-using SandcastleBuilder.Utils.BuildEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +5,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Sandcastle.Core.BuildEngine;
+using Sandcastle.Core.PlugIn;
 
 namespace AvaloniaAttributes
 {
@@ -36,7 +36,7 @@ namespace AvaloniaAttributes
 
         private List<ExecutionPoint>? _executionPoints;
 
-        private BuildProcess? _builder;
+        private IBuildProcess? _builder;
 
         //=====================================================================
 
@@ -61,7 +61,7 @@ namespace AvaloniaAttributes
         /// </summary>
         /// <param name="buildProcess">A reference to the current build process</param>
         /// <param name="configuration">The configuration data that the plug-in should use to initialize itself</param>
-        public void Initialize(BuildProcess buildProcess, XElement configuration)
+        public void Initialize(IBuildProcess buildProcess, XElement configuration)
         {
             _builder = buildProcess;
 

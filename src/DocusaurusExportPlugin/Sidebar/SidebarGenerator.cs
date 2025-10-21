@@ -54,7 +54,7 @@ namespace DocusaurusExportPlugin.Sidebar
 
         private string GetPackageNameFromAssemblyName(string assemblyName)
         {
-            return DocusaurusExportPluginPlugIn.AssemblyPackageMapping!.TryGetValue(assemblyName, out var packageName) ?
+            return DocusaurusExportPlugIn.AssemblyPackageMapping!.TryGetValue(assemblyName, out var packageName) ?
                 packageName :
                 assemblyName;
         }

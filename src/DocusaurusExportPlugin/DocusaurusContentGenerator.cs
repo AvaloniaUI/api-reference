@@ -24,7 +24,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using DocusaurusExportPlugin.Sidebar;
-using SandcastleBuilder.Utils.BuildEngine;
+using Sandcastle.Core.BuildEngine;
 
 namespace DocusaurusExportPlugin
 {
@@ -40,7 +40,7 @@ namespace DocusaurusExportPlugin
 
         private static readonly MatchEvaluator MeDecodeEntities = m => WebUtility.HtmlDecode(m.Value);
 
-        private readonly BuildProcess _buildProcess;
+        private readonly IBuildProcess _buildProcess;
         private readonly string _workingFolder;
 
         //=====================================================================
@@ -49,7 +49,7 @@ namespace DocusaurusExportPlugin
         /// Constructor
         /// </summary>
         /// <param name="buildProcess">The build process to use</param>
-        public DocusaurusContentGenerator(BuildProcess buildProcess)
+        public DocusaurusContentGenerator(IBuildProcess buildProcess)
         {
             _buildProcess = buildProcess ?? throw new ArgumentNullException(nameof(buildProcess));
 

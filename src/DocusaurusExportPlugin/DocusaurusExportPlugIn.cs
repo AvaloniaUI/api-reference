@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Xml.Linq;
-
-using SandcastleBuilder.Utils.BuildComponent;
-using SandcastleBuilder.Utils.BuildEngine;
+using Sandcastle.Core.BuildEngine;
+using Sandcastle.Core.PlugIn;
 
 namespace DocusaurusExportPlugin
 {
@@ -30,13 +29,13 @@ namespace DocusaurusExportPlugin
     /// dispose of them when the container is disposed of.</remarks>
     [HelpFileBuilderPlugInExport("DocusaurusExport", Version = AssemblyInfo.ProductVersion,
       Copyright = AssemblyInfo.Copyright, Description = "DocusaurusExport plug-in")]
-    public sealed class DocusaurusExportPluginPlugIn : IPlugIn
+    public sealed class DocusaurusExportPlugIn : IPlugIn
     {
         //=====================================================================
 
         private List<ExecutionPoint>? _executionPoints;
 
-        private BuildProcess? _builder;
+        private IBuildProcess? _builder;
 
         /// <summary>
         /// Gets a dictionary with the mapping between the AssemblyName and the nuget package
@@ -68,7 +67,7 @@ namespace DocusaurusExportPlugin
         /// </summary>
         /// <param name="buildProcess">A reference to the current build process</param>
         /// <param name="configuration">The configuration data that the plug-in should use to initialize itself</param>
-        public void Initialize(BuildProcess buildProcess, XElement configuration)
+        public void Initialize(IBuildProcess buildProcess, XElement configuration)
         {
             _builder = buildProcess;
 
@@ -101,7 +100,7 @@ namespace DocusaurusExportPlugin
         /// This handles garbage collection to ensure proper disposal of the plug-in if not done explicitly
         /// with <see cref="Dispose()"/>.
         /// </summary>
-        ~DocusaurusExportPluginPlugIn()
+        ~DocusaurusExportPlugIn()
         {
             this.Dispose();
         }

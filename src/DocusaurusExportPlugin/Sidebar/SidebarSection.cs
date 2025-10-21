@@ -41,6 +41,9 @@ namespace DocusaurusExportPlugin.Sidebar
         /// </summary>
         public string? Path { get; set; }
         
+        /// <summary>
+        /// Gets or sets the classes to use
+        /// </summary>
         public string? Classes {get; set;}
         
         /// <summary>
