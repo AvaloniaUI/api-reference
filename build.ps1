@@ -69,24 +69,49 @@ $projectsToBuild = @(
 	"src/ApiDocumentation/ApiDocumentation.shfbproj"
 )
 
-foreach ($proj in $projectsToBuild){
-	dotnet build $proj -c Release
-	Write-Host "`n built $proj" -ForegroundColor DarkGreen -BackgroundColor Gray
-	Write-Host "`n"
+foreach ($proj in $projectsToBuild)
+{
+    # Ensure dotnet resolves global.json relative to the project by changing into the project's directory
+    $projDir = Split-Path $proj -Parent
+    $projFile = Split-Path $proj -Leaf
+
+    if (-not [string]::IsNullOrEmpty($projDir))
+    {
+        Push-Location $projDir
+        try
+        {
+            Write-Host "Building $projFile in directory $( Get-Location )..."
+            dotnet build ".\$projFile" -c Release
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    else
+    {
+        # project is in repository root
+        Write-Information "Building $projFile in repository root..."
+        dotnet build ".\$projFile" -c Release
+    }
+
+    Write-Information "`n built $projFile"
+    Write-Information "`n"
 }
+
 
 # preview the website if preview switch is on
 if($preview.IsPresent){
-	pushd ./website
+	Push-Location ./website
 	./build.ps1 -preview
-	popd
+	Pop-Location
 }
 
 # build the website if build switch is on
 if($build.IsPresent){
-	pushd ./website
+	Push-Location ./website
     ./build.ps1 -build
-	popd
+	Pop-Location
 }
 
 # pack the md-files and version settings if pack switch is on

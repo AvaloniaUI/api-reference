@@ -14,30 +14,40 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x'
+
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.111'
+          dotnet-version: '9.x'
+
       - uses: actions/setup-node@v3
         with:
           node-version: 22.14
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.8.0
+
       - name: workloads 1
         run: dotnet workload restore ext/Avalonia/src/iOS/Avalonia.iOS/Avalonia.iOS.csproj
+
       - name: workloads 2
         run: dotnet workload restore ext/Avalonia/src/Android/Avalonia.Android/Avalonia.Android.csproj
+
       - name: Run build script
         run: ./build.ps1 -pack
-      - name: find
-        shell: bash
-        run: find ./artifacts.zip
+
       - name: Upload SFHB result temporarily as atifact
         uses: actions/upload-artifact@v4
         with:
           name: website-artifact
           path: ./artifacts.zip
           retention-days: 1
+
   docusaurus_deploy_job:
     runs-on: ubuntu-latest
     name: Build website
@@ -48,20 +58,26 @@ jobs:
         with:
           name: website-artifact
           path: ./website/
+
       - uses: actions/setup-node@v3
         with:
           node-version: 22.14
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.8.0
+
       - name: Run build script
         working-directory: ./website/
         run: bash ./build.sh --build
+
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install -y rsync
+
       - name: Setup key
         working-directory: ./website/
         run: echo '${{ secrets.DEPLOY_KEY }}' > ./upload.key && chmod 700 ./upload.key
+
       - name: Build And Deploy
         working-directory: ./website/
         run: ./deploy.sh ${{ vars.DEPLOY_HOST }} ${{ vars.DEPLOY_PORT }} ${{ vars.DEPLOY_USER }}
