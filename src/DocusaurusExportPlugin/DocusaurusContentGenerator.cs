@@ -328,7 +328,7 @@ namespace DocusaurusExportPlugin
                     // We may get more than one line so find the last one with a section title which will be
                     // the closest to the span.
                     string? title = sectionTitle.Value.Split(new[] { '\r', '\n' },
-                        StringSplitOptions.RemoveEmptyEntries).Reverse().FirstOrDefault(
+                        StringSplitOptions.RemoveEmptyEntries).AsEnumerable().Reverse().FirstOrDefault(
                         t => t.Trim().Length > 2 && t[0] == '#');
 
                     if (title != null)

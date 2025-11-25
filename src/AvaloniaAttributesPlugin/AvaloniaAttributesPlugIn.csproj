@@ -62,7 +62,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.ComponentModel.Composition" Version="9.0.10" />
+		<PackageReference Include="System.ComponentModel.Composition" Version="10.0.0" />
 		<PackageReference Include="EWSoftware.Sandcastle.Core" Version="2025.9.30" />
 	</ItemGroup>
 
