@@ -28,7 +28,6 @@
 	"Avalonia.FreeDesktop" : "Avalonia.FreeDesktop",
 	"Avalonia.iOS" : "Avalonia.iOS",
 	"Avalonia.Native" : "Avalonia.Native",
-	"Avalonia.ReactiveUI" : "Avalonia.ReactiveUI",
 	"Avalonia.Remote.Protocol" : "Avalonia.Remote.Protocol ",
 	"Avalonia.Skia" : "Avalonia.Skia",
 	"Avalonia.Themes.Fluent" : "Avalonia.Themes.Fluent",

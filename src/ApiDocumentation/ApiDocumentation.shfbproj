@@ -61,7 +61,6 @@
 		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.Metal\Avalonia.Metal.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
 		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.Native\Avalonia.Native.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
 		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.OpenGL\Avalonia.OpenGL.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
-		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.ReactiveUI\Avalonia.ReactiveUI.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
 		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.Themes.Fluent\Avalonia.Themes.Fluent.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
 		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.Themes.Simple\Avalonia.Themes.Simple.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
 		  <DocumentationSource sourceFile="..\..\ext\Avalonia\src\Avalonia.Vulkan\Avalonia.Vulkan.csproj" TargetFramework="$(AvsCurrentTargetFramework)" />
