@@ -1,3 +1,6 @@
+> [!WARNING]
+> This repository is not used anymore. The API reference lives at https://github.com/AvaloniaUI/avalonia-docs/
+
 # Avalonia API-Reference
 This project generates the [Avalonia](https://avaloniaui.net) API reference documentation.
 
